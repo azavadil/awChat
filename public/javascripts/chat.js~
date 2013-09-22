@@ -1,0 +1,55 @@
+/**
+ * Note: 
+ * -----
+ * The first step is to connect to the server (#1). This will send a connection
+ * request to the server from which the page was loaded. This will also negotiate the
+ * transport protocol and will finally result in the connection event being triggered 
+ * on the server. 
+ */ 
+
+/** 
+ * Message received handler
+ * ------------------------
+ * The following handle the receipt of a message. The JSON is parsed
+ * and the message is appended to the #messages element using jQuery
+ */
+
+
+/**
+ * Message send 
+ * ------------
+ * We're using jQuery. Remember $(document).ready(function (){ ... } 
+ * is the same as $(function(){ ... }
+ * All we're doing here is attaching an event handler to the send button
+ * onclick. 
+ * 
+ * so onclick, we create a data object, extract the value from the #message div, 
+ * the message property of the object to the #message div value, set the 
+ * type property of the object to 'userMessage', and then send the value
+ */ 
+ 
+
+
+
+var socket = io.connect('/');      
+
+
+socket.on('message', function( data ){ 
+    data = JSON.parse( data ); 
+    $('#messages').append('<div class="' + data.type + '">' + data.message + '</div>'); 
+});
+
+
+
+$(function() { 
+    $('#send').click( function() { 
+	var data = { 
+	    message: $('#message').val(), 
+	    type: 'userMessage'
+	}; 
+	socket.send(JSON.stringify( data )); 
+	$('#message').val(''); 
+    }); 
+}); 
+    
+  

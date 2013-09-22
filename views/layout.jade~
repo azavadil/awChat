@@ -1,0 +1,10 @@
+doctype 5
+html
+  block head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    header#banner
+      Awesome chat
+    block content
+    footer Hope you enjoy your stay here
