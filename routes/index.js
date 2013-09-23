@@ -9,8 +9,8 @@ exports.index = function(req, res){
 
 
 
-/*
+
 exports.chatroom = function(req, res){ 
     res.render('chatroom', { title: 'Express chat'});
 }
-*/
+

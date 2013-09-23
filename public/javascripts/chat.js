@@ -45,13 +45,22 @@
 var chatInfra = io.connect('/chat_infra'),
 chatCom = io.connect('/chat_com'); 
 
+var roomName = decodeURI((RegExp('room=' + '(.+?)(&|$)').exec(location.search) || [,null])[1]); 
 
 
+/**
+ * Note: 
+ * -----
+ * this section will only execute if there
+ * is a roomName in the URL
+ */ 
 
+
+if ( roomName ){ 
 
     
     chatInfra.on('name_set', function( data ){ 
-
+	chatInfra.emit('join_room', {'name': roomName}); 
 	
 	chatInfra.on('user_entered', function( user ){ 
 	    $('#messages').append('<div clss="systemMessage">' + user.name + ' has joined the room.</div>');
@@ -82,7 +91,7 @@ chatCom = io.connect('/chat_com');
 	}); 
  
     }); 
-
+}
 
 $(function() { 
     $('#setname').click(function() { 
