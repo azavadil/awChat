@@ -41,45 +41,52 @@
  * in socket). 
  */ 
 
-var socket = io.connect('/');      
+
+var chatInfra = io.connect('/chat_infra'),
+chatCom = io.connect('/chat_com'); 
 
 
 
-socket.on('name_set', function( data ){ 
-    $('#nameform').hide(); 
-    $('#messages').append('<div class="systemMessage">' + 
-			  'Hello ' + data.name + '</div>'); 
-    $('#send').click( function() { 
-	var data = { 
-	    message: $('#message').val(), 
-	    type: 'userMessage'
-	}; 
-	socket.send(JSON.stringify( data )); 
-	$('#message').val(''); 
-    }); 
 
-
-    socket.on('message', function( data ){ 
-	var parsedData = JSON.parse( data );
-	
-	if( parsedData.username ){ 
-	    $('#messages').append('<div class="' + parsedData.type + '"><span class="name">' 
-				  +parsedData.username+ ":</span> " + parsedData.message + '</div>'); 
-	} else { 
-	    $('#messages').append('<div class="' + parsedData.type + '">' + parsedData.message + '</div>');
-	}
-    });
 
     
-    socket.on('user_entered', function( user ){ 
-	$('#messages').append('<div clss="systemMessage">' + user.name + ' has joined the room.</div>'); 
+    chatInfra.on('name_set', function( data ){ 
+
+	
+	chatInfra.on('user_entered', function( user ){ 
+	    $('#messages').append('<div clss="systemMessage">' + user.name + ' has joined the room.</div>');
+	}); 
+
+	chatInfra.on('message', function( message ) { 
+	    var message = JSON.parse( message ); 
+	    $('#messages').append('<div class="' + message.type + '">' + message.message + '</div>'); 
+	}); 
+
+	chatCom.on('message', function( message ){
+	    var parsedMsg = JSON.parse( message );
+	    $('#messages').append('<div class="' + parsedMsg.type + '"><span class="name">' 
+				  +parsedMsg.username+ ":</span> " + parsedMsg.message + '</div>'); 
+	}); 	
+
+
+	$('#nameform').hide(); 
+	$('#messages').append('<div class="systemMessage">Hello ' + data.name + '</div>'); 
+	
+	$('#send').click( function() { 
+	    var data = { 
+		message: $('#message').val(), 
+		type: 'userMessage'
+	    }; 
+	    chatCom.send(JSON.stringify( data )); 
+	    $('#message').val(''); 
+	}); 
+ 
     }); 
-}); 
 
 
 $(function() { 
     $('#setname').click(function() { 
-	socket.emit('set_name', {name: $('#nickname').val()}); 
+	chatInfra.emit('set_name', {name: $('#nickname').val()}); 
     }); 
 }); 
     
