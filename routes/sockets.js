@@ -53,6 +53,18 @@ exports.initialize = function( server ){
 		socket.in(room.name).broadcast.emit('user_entered', {'name':nickname});
 	    }); 
 	});
+	
+	socket.on('get_rooms', function() { 
+	    var rooms ={}; 
+	    for(var room in io.sockets.manager.rooms){
+		if( room.indexOf('/chat_infra/') == 0 ){ 
+		    var roomName = room.replace('/chat_infra/', ''); 
+		    rooms[roomName] = io.sockets.manager.rooms[room].length; 
+		}
+	    }
+	    socket.emit('rooms_list', rooms); 
+	}); 
+	
     }); 
 	
 
