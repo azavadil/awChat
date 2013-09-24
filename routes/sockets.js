@@ -33,19 +33,29 @@ var io = require('socket.io');
 exports.initialize = function( server ){ 
     io = io.listen( server );
 
+    io.set('authorization', function(data, accept){
+	if( data.headers.cookie ){
+	    data.cookie = require('cookie').parse(data.headers.cookie); 
+	    data.sessionID = data.cookie['express.sid'].split('.')[0]; 
+	    data.nickname = data.cookie['nickname']; 
+	} else { 
+	    return accept('No cookie transmitted', false); 
+	}
+	accept(null, true); 
+    }); 
+
+
+
     var self = this; 
 
     this.chatInfra = io.of("/chat_infra"); 
     this.chatInfra.on('connection', function( socket ){ 
-	socket.on('set_name', function( data ){ 
-	    socket.set('nickname', data.name, function(){ 
-		socket.emit('name_set', data); 
-		socket.send(JSON.stringify({ type: 'serverMessage', message: 'Welcome to awChat'}));
-	    });
-	});
-	
-	socket.on('join_room', function( room ){ 
-	    socket.get('nickname', function( err, nickname ){ 
+	socket.on('join_room', function(room){
+	    var nickname = socket.handshake.nickname; 
+	    socket.set('nickname', nickname, function(){
+		socket.emit('name_set', {'name': socket.handshake.nickname}); 
+		socket.send(JSON.stringify({type:'serverMessage', message:'Welcome to awChat'})); 
+			    
 		socket.join(room.name); 
 		var comSocket = self.chatCom.sockets[socket.id]; 
 		comSocket.join(room.name); 

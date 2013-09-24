@@ -8,8 +8,21 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
+var connect = require('connect'); 
 
 var app = express();
+
+
+/** 
+ * Note: 
+ * -----
+ * The connect keyword is used to create a session store
+ * Once we have the sessionStore we can use it throughout the 
+ * the application
+ */ 
+
+var sessionStore = new connect.session.MemoryStore(); 
+
 
 // all environments
 app.set('port', process.env.PORT || 8080);
@@ -18,6 +31,8 @@ app.set('view engine', 'jade');
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
+app.use(express.cookieParser('tahcwaterces')); 
+app.use(express.session({key:'express.sid', store:sessionStore}));  //sessionStore being used
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));

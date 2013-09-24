@@ -57,10 +57,10 @@ var roomName = decodeURI((RegExp('room=' + '(.+?)(&|$)').exec(location.search) |
 
 
 if ( roomName ){ 
-
+    
+    chatInfra.emit('join_room', {'name':roomName}); 
     
     chatInfra.on('name_set', function( data ){ 
-	chatInfra.emit('join_room', {'name': roomName}); 
 	
 	chatInfra.on('user_entered', function( user ){ 
 	    $('#messages').append('<div clss="systemMessage">' + user.name + ' has joined the room.</div>');
